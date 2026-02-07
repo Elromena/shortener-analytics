@@ -1,0 +1,243 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import { api } from './api/client';
+import { useAuth } from './contexts/AuthContext';
+import Navigation from './components/Navigation';
+import Notification from './components/Notification';
+import BrandsView from './views/BrandsView';
+import CreateBrandView from './views/CreateBrandView';
+import CreateLinkView from './views/CreateLinkView';
+import DashboardView from './views/DashboardView';
+import LoginView from './views/LoginView';
+import RegisterView from './views/RegisterView';
+
+export default function App() {
+  const { user, loading: authLoading } = useAuth();
+  const [brands, setBrands] = useState([]);
+  const [currentView, setCurrentView] = useState('brands');
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const [authView, setAuthView] = useState('login'); // 'login' or 'register'
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      loadBrands();
+    }
+  }, [user]);
+
+  const loadBrands = async () => {
+    try {
+      setLoading(true);
+      const { brands } = await api.getBrands();
+      setBrands(brands);
+    } catch (error) {
+      showNotification(error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+  };
+
+  const getBrandStats = async (brandId, dateRange = 30) => {
+    try {
+      const stats = await api.getBrandStats(brandId, dateRange);
+      return stats;
+    } catch (error) {
+      console.error('Get brand stats error:', error);
+      return { totalClicks: 0, activeLinks: 0 };
+    }
+  };
+
+  const getPerformanceChartData = async (brandId, dateRange, chartMetrics) => {
+    try {
+      const { data } = await api.getPerformanceData(brandId, dateRange, chartMetrics);
+      return data;
+    } catch (error) {
+      console.error('Get performance data error:', error);
+      return [];
+    }
+  };
+
+  const getFilteredLinks = async (brandId, filters) => {
+    try {
+      const { links } = await api.getLinks(brandId, {
+        search: filters.searchQuery,
+        platform: filters.platformFilter,
+        category: filters.categoryFilter,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      });
+      return links;
+    } catch (error) {
+      console.error('Get links error:', error);
+      return [];
+    }
+  };
+
+  const getTopPerformers = async (brandId, limit = 5, dateRange = 30) => {
+    try {
+      const { links } = await api.getTopPerformers(brandId, limit, dateRange);
+      return links;
+    } catch (error) {
+      console.error('Get top performers error:', error);
+      return [];
+    }
+  };
+
+  const createBrand = async (data) => {
+    try {
+      const { brand } = await api.createBrand(data);
+      setBrands((prev) => [brand, ...prev]);
+      setSelectedBrand(brand);
+      setCurrentView('dashboard');
+      showNotification('Brand created successfully');
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  };
+
+  const createLink = async (data) => {
+    try {
+      const { link } = await api.createLink(data);
+      const brand = brands.find((b) => b.id === selectedBrand.id);
+      const shortUrl = `https://${brand.domain}/${brand.slug}/${link.short_code}`;
+      navigator.clipboard.writeText(shortUrl);
+      showNotification('Link created! Short URL copied to clipboard.');
+      setCurrentView('dashboard');
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  };
+
+  const archiveLinks = async (linkIds) => {
+    try {
+      await api.archiveLinks(linkIds);
+      showNotification(`${linkIds.length} link(s) archived`);
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  };
+
+  const trackClick = async (linkId) => {
+    try {
+      await api.trackClick(linkId);
+      showNotification('Test click recorded');
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  };
+
+  const duplicateLink = async (link) => {
+    try {
+      const newLink = {
+        brand_id: link.brand_id,
+        original_url: link.original_url,
+        title: `${link.title} (copy)`,
+        platform: link.platform,
+        category: link.category,
+        content_type: link.content_type,
+        tags: link.tags,
+      };
+      const { link: created } = await api.createLink(newLink);
+      const brand = brands.find((b) => b.id === selectedBrand.id);
+      const shortUrl = `https://${brand.domain}/${brand.slug}/${created.short_code}`;
+      navigator.clipboard.writeText(shortUrl);
+      showNotification('Link duplicated! Short URL copied.');
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  };
+
+  const exportCSV = () => {
+    api.exportCSV(selectedBrand.id);
+    showNotification('CSV exported');
+  };
+
+  const handleNavigate = (view) => {
+    setCurrentView(view);
+    if (view === 'brands') {
+      setSelectedBrand(null);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <div className="app loading-screen">
+        <div className="loading-spinner">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="app">
+        {authView === 'login' ? (
+          <LoginView onSwitchToRegister={() => setAuthView('register')} />
+        ) : (
+          <RegisterView onSwitchToLogin={() => setAuthView('login')} />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="app">
+      <Navigation
+        currentView={currentView}
+        selectedBrand={selectedBrand}
+        onNavigate={handleNavigate}
+      />
+      <main className="main">
+        {currentView === 'brands' && (
+          <BrandsView
+            brands={brands}
+            getBrandStats={getBrandStats}
+            onSelectBrand={(b) => {
+              setSelectedBrand(b);
+              setCurrentView('dashboard');
+            }}
+            onCreateBrand={() => setCurrentView('create-brand')}
+          />
+        )}
+        {currentView === 'create-brand' && (
+          <CreateBrandView
+            onCreateBrand={createBrand}
+            onCancel={() => setCurrentView('brands')}
+          />
+        )}
+        {currentView === 'dashboard' && selectedBrand && (
+          <DashboardView
+            brand={selectedBrand}
+            getBrandStats={getBrandStats}
+            getPerformanceChartData={getPerformanceChartData}
+            getFilteredLinks={getFilteredLinks}
+            getTopPerformers={getTopPerformers}
+            onArchiveLinks={archiveLinks}
+            onExportCSV={exportCSV}
+            onTrackClick={trackClick}
+            onDuplicateLink={duplicateLink}
+            onCreateLink={() => setCurrentView('create-link')}
+          />
+        )}
+        {currentView === 'create-link' && selectedBrand && (
+          <CreateLinkView
+            brand={selectedBrand}
+            onCreateLink={createLink}
+            onCancel={() => setCurrentView('dashboard')}
+          />
+        )}
+      </main>
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
+    </div>
+  );
+}

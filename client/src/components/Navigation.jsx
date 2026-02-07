@@ -1,6 +1,9 @@
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navigation({ currentView, selectedBrand, onNavigate }) {
+  const { user, logout } = useAuth();
+
   return (
     <nav className="nav">
       <div className="nav-brand">
@@ -30,6 +33,12 @@ export default function Navigation({ currentView, selectedBrand, onNavigate }) {
             </button>
           </>
         )}
+      </div>
+      <div className="nav-user">
+        <span className="nav-user-name">{user?.name}</span>
+        <button className="btn btn-ghost btn-sm" onClick={logout}>
+          Logout
+        </button>
       </div>
     </nav>
   );

@@ -1,11 +1,15 @@
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_20", "postgresql"]
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = [
+  "npm install",
+  "cd server && npm install",
+  "cd client && npm install"
+]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["cd client && npm run build"]
 
 [start]
-cmd = "npx serve -s dist"
+cmd = "cd server && npm start"
