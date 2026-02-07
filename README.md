@@ -12,7 +12,15 @@ A comprehensive link management and analytics platform for managing multiple bra
 - **Bulk Operations** — Archive multiple links with confirmation
 - **CSV Export** — Export all link data and click counts
 
-## Getting Started
+## Deployment
+
+This app is configured for Railway deployment:
+
+1. Push to GitHub: `git push`
+2. Connect repo in Railway dashboard
+3. Railway will auto-deploy using the configuration in `nixpacks.toml`
+
+## Local Development
 
 ```bash
 npm install
