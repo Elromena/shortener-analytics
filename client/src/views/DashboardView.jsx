@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -49,33 +49,55 @@ export default function DashboardView({
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedLinks, setSelectedLinks] = useState(new Set());
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [stats, setStats] = useState({ totalClicks: 0, activeLinks: 0 });
+  const [chartData, setChartData] = useState([]);
+  const [filteredLinks, setFilteredLinks] = useState([]);
+  const [topPerformers, setTopPerformers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const stats = useMemo(
-    () => getBrandStats(brand.id, dateRange),
-    [brand.id, getBrandStats, dateRange]
-  );
+  useEffect(() => {
+    loadStats();
+  }, [brand.id, dateRange]);
 
-  const chartData = useMemo(
-    () => getPerformanceChartData(brand.id, dateRange, chartMetrics),
-    [brand.id, getBrandStats, dateRange, chartMetrics]
-  );
+  useEffect(() => {
+    loadChartData();
+  }, [brand.id, dateRange, chartMetrics]);
 
-  const filteredLinks = useMemo(
-    () =>
-      getFilteredLinks(brand.id, {
-        searchQuery,
-        platformFilter,
-        categoryFilter,
-        sortBy,
-        sortOrder,
-      }),
-    [brand.id, getBrandStats, searchQuery, platformFilter, categoryFilter, sortBy, sortOrder]
-  );
+  useEffect(() => {
+    loadLinks();
+  }, [brand.id, searchQuery, platformFilter, categoryFilter, sortBy, sortOrder]);
 
-  const topPerformers = useMemo(
-    () => getTopPerformers(brand.id, 5, dateRange),
-    [brand.id, getBrandStats, dateRange]
-  );
+  useEffect(() => {
+    loadTopPerformers();
+  }, [brand.id, dateRange]);
+
+  const loadStats = async () => {
+    const data = await getBrandStats(brand.id, dateRange);
+    setStats(data);
+  };
+
+  const loadChartData = async () => {
+    const data = await getPerformanceChartData(brand.id, dateRange, chartMetrics);
+    setChartData(data);
+  };
+
+  const loadLinks = async () => {
+    setLoading(true);
+    const data = await getFilteredLinks(brand.id, {
+      searchQuery,
+      platformFilter,
+      categoryFilter,
+      sortBy,
+      sortOrder,
+    });
+    setFilteredLinks(data);
+    setLoading(false);
+  };
+
+  const loadTopPerformers = async () => {
+    const data = await getTopPerformers(brand.id, 5, dateRange);
+    setTopPerformers(data);
+  };
 
   const totalPages = Math.ceil(filteredLinks.length / itemsPerPage);
   const paginatedLinks = filteredLinks.slice(
@@ -123,10 +145,12 @@ export default function DashboardView({
     setShowArchiveConfirm(true);
   };
 
-  const confirmArchive = () => {
-    onArchiveLinks(Array.from(selectedLinks));
+  const confirmArchive = async () => {
+    await onArchiveLinks(Array.from(selectedLinks));
     setSelectedLinks(new Set());
     setShowArchiveConfirm(false);
+    loadLinks();
+    loadStats();
   };
 
   const copyShortUrl = (link) => {
@@ -134,7 +158,7 @@ export default function DashboardView({
     navigator.clipboard.writeText(url);
   };
 
-  const chartLines = useMemo(() => {
+  const chartLines = (() => {
     const lines = [];
     if (chartMetrics.total) lines.push({ key: 'total', label: 'Total Clicks', color: CHART_COLORS.total });
     if (chartMetrics.byPlatform) {
@@ -144,7 +168,7 @@ export default function DashboardView({
       categories.forEach((c) => lines.push({ key: c, label: c, color: CHART_COLORS[c] || '#9ca3af' }));
     }
     return lines;
-  }, [chartMetrics, platforms, categories]);
+  })();
 
   return (
     <div className="view dashboard-view">
