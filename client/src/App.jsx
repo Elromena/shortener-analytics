@@ -21,12 +21,26 @@ export default function App() {
   const [notification, setNotification] = useState(null);
   const [authView, setAuthView] = useState('login'); // 'login' or 'register'
   const [loading, setLoading] = useState(false);
+  const [appUrl, setAppUrl] = useState('');
+
+  useEffect(() => {
+    loadConfig();
+  }, []);
 
   useEffect(() => {
     if (user) {
       loadBrands();
     }
   }, [user]);
+
+  const loadConfig = async () => {
+    try {
+      const { appUrl } = await api.getConfig();
+      setAppUrl(appUrl);
+    } catch (error) {
+      console.error('Failed to load config:', error);
+    }
+  };
 
   const loadBrands = async () => {
     try {
@@ -119,7 +133,7 @@ export default function App() {
     try {
       const { link } = await api.createLink(data);
       const brand = brands.find((b) => b.id === selectedBrand.id);
-      const shortUrl = `https://${brand.domain}/${brand.slug}/${link.short_code}`;
+      const shortUrl = `${appUrl}/r/${brand.slug}/${link.short_code}`;
       navigator.clipboard.writeText(shortUrl);
       showNotification('Link created! Short URL copied to clipboard.');
       setCurrentView('dashboard');
@@ -159,7 +173,7 @@ export default function App() {
       };
       const { link: created } = await api.createLink(newLink);
       const brand = brands.find((b) => b.id === selectedBrand.id);
-      const shortUrl = `https://${brand.domain}/${brand.slug}/${created.short_code}`;
+      const shortUrl = `${appUrl}/r/${brand.slug}/${created.short_code}`;
       navigator.clipboard.writeText(shortUrl);
       showNotification('Link duplicated! Short URL copied.');
     } catch (error) {
@@ -237,6 +251,7 @@ export default function App() {
             onDuplicateLink={duplicateLink}
             onCreateLink={() => setCurrentView('create-link')}
             onNavigate={setCurrentView}
+            appUrl={appUrl}
           />
         )}
         {currentView === 'create-link' && selectedBrand && (

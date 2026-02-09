@@ -25,7 +25,6 @@ export default function BrandSettingsView({ brand, onUpdateBrand, onBack }) {
 
     const errs = {};
     if (!name.trim()) errs.name = 'Name is required';
-    if (!domain.trim()) errs.domain = 'Domain is required';
 
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
@@ -52,7 +51,7 @@ export default function BrandSettingsView({ brand, onUpdateBrand, onBack }) {
 
     const success = await onUpdateBrand(brand.id, {
       name: name.trim(),
-      domain: domain.trim(),
+      domain: domain.trim() || name.trim(),
       default_categories: categories,
       default_tags: tags,
       default_platforms: platforms,
@@ -107,14 +106,17 @@ export default function BrandSettingsView({ brand, onUpdateBrand, onBack }) {
         </div>
 
         <div className="form-group">
-          <label htmlFor="domain">Domain</label>
+          <label htmlFor="domain">Display Domain (Optional)</label>
           <input
             id="domain"
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            placeholder="e.g. blockchain-ads.com"
+            placeholder="e.g. blockchain-ads.com (for display only)"
           />
+          <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+            Short URLs use the app domain. This is just for display/branding.
+          </small>
           {errors.domain && <span className="form-error">{errors.domain}</span>}
         </div>
 

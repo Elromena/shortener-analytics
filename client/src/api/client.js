@@ -34,6 +34,9 @@ const request = async (endpoint, options = {}) => {
 };
 
 export const api = {
+  // Config
+  getConfig: () => request('/api/config', { skipAuth: true }),
+
   // Auth
   register: (data) => request('/api/auth/register', {
     method: 'POST',

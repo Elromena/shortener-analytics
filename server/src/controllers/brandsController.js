@@ -31,8 +31,8 @@ export const createBrand = async (req, res) => {
       default_content_types = []
     } = req.body;
 
-    if (!name || !slug || !domain) {
-      return res.status(400).json({ error: 'Name, slug, and domain are required' });
+    if (!name || !slug) {
+      return res.status(400).json({ error: 'Name and slug are required' });
     }
 
     // Check if slug already exists

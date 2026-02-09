@@ -34,6 +34,7 @@ export default function DashboardView({
   onDuplicateLink,
   onCreateLink,
   onNavigate,
+  appUrl,
 }) {
   const [dateRange, setDateRange] = useState(30);
   const [chartMetrics, setChartMetrics] = useState({
@@ -155,7 +156,7 @@ export default function DashboardView({
   };
 
   const copyShortUrl = (link) => {
-    const url = `https://${brand.domain}/${brand.slug}/${link.short_code}`;
+    const url = `${appUrl}/r/${brand.slug}/${link.short_code}`;
     navigator.clipboard.writeText(url);
   };
 
@@ -430,7 +431,7 @@ export default function DashboardView({
                   <td>{link.title}</td>
                   <td>
                     <code className="short-url">
-                      {brand.domain}/{brand.slug}/{link.short_code}
+                      {appUrl ? `${appUrl}/r/${brand.slug}/${link.short_code}` : 'Loading...'}
                     </code>
                   </td>
                   <td>{link.platform}</td>

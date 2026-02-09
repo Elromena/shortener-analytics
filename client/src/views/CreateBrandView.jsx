@@ -22,7 +22,6 @@ export default function CreateBrandView({ onCreateBrand, onCancel }) {
     const errs = {};
     if (!name.trim()) errs.name = 'Name is required';
     if (!slug.trim()) errs.slug = 'Slug is required';
-    if (!domain.trim()) errs.domain = 'Domain is required';
 
     const categories = defaultCategories
       .split(',')
@@ -49,7 +48,7 @@ export default function CreateBrandView({ onCreateBrand, onCancel }) {
     onCreateBrand({
       name: name.trim(),
       slug: slug.trim().toLowerCase(),
-      domain: domain.trim(),
+      domain: domain.trim() || name.trim(),
       default_categories: categories,
       default_tags: tags,
       default_platforms: platforms,
@@ -89,14 +88,17 @@ export default function CreateBrandView({ onCreateBrand, onCancel }) {
           {errors.slug && <span className="form-error">{errors.slug}</span>}
         </div>
         <div className="form-group">
-          <label htmlFor="domain">Domain</label>
+          <label htmlFor="domain">Display Domain (Optional)</label>
           <input
             id="domain"
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            placeholder="e.g. blockchain-ads.com"
+            placeholder="e.g. blockchain-ads.com (for display only)"
           />
+          <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+            Short URLs will use the app domain. This is just for display/branding.
+          </small>
           {errors.domain && <span className="form-error">{errors.domain}</span>}
         </div>
         <div className="form-group">
