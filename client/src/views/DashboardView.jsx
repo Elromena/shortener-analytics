@@ -176,7 +176,11 @@ export default function DashboardView({
       <header className="view-header">
         <h1>{brand.name} — Dashboard</h1>
         <div className="header-actions">
-          <button className="btn btn-ghost" onClick={() => window.location.href = '#team'} 
+          <button className="btn btn-ghost" 
+                  onClick={(e) => { e.preventDefault(); onNavigate('brand-settings'); }}>
+            ⚙️ Settings
+          </button>
+          <button className="btn btn-ghost" 
                   onClick={(e) => { e.preventDefault(); onNavigate('team-management'); }}>
             👥 Team
           </button>

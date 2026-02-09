@@ -11,6 +11,7 @@ import DashboardView from './views/DashboardView';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 import TeamManagementView from './views/TeamManagementView';
+import BrandSettingsView from './views/BrandSettingsView';
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
@@ -98,6 +99,19 @@ export default function App() {
       showNotification('Brand created successfully');
     } catch (error) {
       showNotification(error.message, 'error');
+    }
+  };
+
+  const updateBrand = async (brandId, data) => {
+    try {
+      const { brand } = await api.updateBrand(brandId, data);
+      await loadBrands(); // Reload all brands from server
+      setSelectedBrand(brand);
+      showNotification('Brand updated successfully');
+      return true;
+    } catch (error) {
+      showNotification(error.message, 'error');
+      return false;
     }
   };
 
@@ -235,6 +249,13 @@ export default function App() {
         {currentView === 'team-management' && selectedBrand && (
           <TeamManagementView
             brand={selectedBrand}
+            onBack={() => setCurrentView('dashboard')}
+          />
+        )}
+        {currentView === 'brand-settings' && selectedBrand && (
+          <BrandSettingsView
+            brand={selectedBrand}
+            onUpdateBrand={updateBrand}
             onBack={() => setCurrentView('dashboard')}
           />
         )}

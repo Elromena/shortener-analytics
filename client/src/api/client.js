@@ -55,6 +55,10 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(data),
   }),
+  updateBrand: (brandId, data) => request(`/api/brands/${brandId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
   getBrandStats: (brandId, dateRange) => 
     request(`/api/brands/${brandId}/stats?dateRange=${dateRange}`),
 

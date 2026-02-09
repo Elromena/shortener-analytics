@@ -50,6 +50,14 @@ export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
     ? brand.default_categories
     : ['Gaming', 'Fintech', 'Advertising', 'Mobile Apps'];
 
+  const platforms = brand?.default_platforms?.length
+    ? brand.default_platforms
+    : PLATFORM_SUGGESTIONS;
+
+  const contentTypes = brand?.default_content_types?.length
+    ? brand.default_content_types
+    : CONTENT_TYPE_SUGGESTIONS;
+
   return (
     <div className="view create-link-view">
       <header className="view-header">
@@ -93,7 +101,7 @@ export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
               placeholder="e.g. Twitter, LinkedIn, or type your own"
             />
             <datalist id="platform-suggestions">
-              {PLATFORM_SUGGESTIONS.map((p) => (
+              {platforms.map((p) => (
                 <option key={p} value={p} />
               ))}
             </datalist>
@@ -122,7 +130,7 @@ export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
             placeholder="e.g. Blog Post, Video, or type your own"
           />
           <datalist id="content-type-suggestions">
-            {CONTENT_TYPE_SUGGESTIONS.map((ct) => (
+            {contentTypes.map((ct) => (
               <option key={ct} value={ct} />
             ))}
           </datalist>

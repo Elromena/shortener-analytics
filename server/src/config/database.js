@@ -32,8 +32,17 @@ export const initDatabase = async () => {
         domain VARCHAR(255) NOT NULL,
         default_categories TEXT[] DEFAULT '{}',
         default_tags TEXT[] DEFAULT '{}',
+        default_platforms TEXT[] DEFAULT '{}',
+        default_content_types TEXT[] DEFAULT '{}',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
+    `);
+
+    // Add columns if they don't exist (for existing databases)
+    await query(`
+      ALTER TABLE brands 
+      ADD COLUMN IF NOT EXISTS default_platforms TEXT[] DEFAULT '{}',
+      ADD COLUMN IF NOT EXISTS default_content_types TEXT[] DEFAULT '{}'
     `);
 
     // Brand members table (for team collaboration)

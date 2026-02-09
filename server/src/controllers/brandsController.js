@@ -21,7 +21,15 @@ export const getBrands = async (req, res) => {
 
 export const createBrand = async (req, res) => {
   try {
-    const { name, slug, domain, default_categories = [], default_tags = [] } = req.body;
+    const { 
+      name, 
+      slug, 
+      domain, 
+      default_categories = [], 
+      default_tags = [],
+      default_platforms = [],
+      default_content_types = []
+    } = req.body;
 
     if (!name || !slug || !domain) {
       return res.status(400).json({ error: 'Name, slug, and domain are required' });
@@ -34,16 +42,54 @@ export const createBrand = async (req, res) => {
     }
 
     const result = await query(
-      `INSERT INTO brands (user_id, name, slug, domain, default_categories, default_tags)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO brands (user_id, name, slug, domain, default_categories, default_tags, default_platforms, default_content_types)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [req.user.id, name, slug, domain, default_categories, default_tags]
+      [req.user.id, name, slug, domain, default_categories, default_tags, default_platforms, default_content_types]
     );
 
     res.status(201).json({ brand: result.rows[0] });
   } catch (error) {
     console.error('Create brand error:', error);
     res.status(500).json({ error: 'Failed to create brand' });
+  }
+};
+
+export const updateBrand = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      name, 
+      domain, 
+      default_categories = [], 
+      default_tags = [],
+      default_platforms = [],
+      default_content_types = []
+    } = req.body;
+
+    // Verify ownership
+    const brandResult = await query(
+      'SELECT * FROM brands WHERE id = $1 AND user_id = $2',
+      [id, req.user.id]
+    );
+
+    if (brandResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Brand not found or access denied' });
+    }
+
+    const result = await query(
+      `UPDATE brands 
+       SET name = $1, domain = $2, default_categories = $3, default_tags = $4,
+           default_platforms = $5, default_content_types = $6
+       WHERE id = $7 AND user_id = $8
+       RETURNING *`,
+      [name, domain, default_categories, default_tags, default_platforms, default_content_types, id, req.user.id]
+    );
+
+    res.json({ brand: result.rows[0] });
+  } catch (error) {
+    console.error('Update brand error:', error);
+    res.status(500).json({ error: 'Failed to update brand' });
   }
 };
 
