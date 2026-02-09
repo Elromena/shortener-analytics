@@ -29,6 +29,7 @@ export default function DashboardView({
   getFilteredLinks,
   getTopPerformers,
   onArchiveLinks,
+  onDeleteLink,
   onExportCSV,
   onTrackClick,
   onDuplicateLink,
@@ -465,6 +466,17 @@ export default function DashboardView({
                           Duplicate
                         </button>
                       )}
+                      <button
+                        className="btn btn-sm btn-ghost"
+                        style={{ color: 'var(--error)' }}
+                        onClick={() => {
+                          if (confirm(`Delete "${link.title}"? This cannot be undone.`)) {
+                            onDeleteLink(link.id).then(() => loadLinks());
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

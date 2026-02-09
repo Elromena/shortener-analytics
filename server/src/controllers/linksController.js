@@ -114,6 +114,33 @@ export const createLink = async (req, res) => {
   }
 };
 
+export const deleteLink = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verify link belongs to user's brand
+    const verifyResult = await query(
+      `SELECT l.id FROM links l
+       INNER JOIN brands b ON l.brand_id = b.id
+       WHERE l.id = $1 AND b.user_id = $2`,
+      [id, req.user.id]
+    );
+
+    if (verifyResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Link not found' });
+    }
+
+    // Delete clicks first, then the link
+    await query('DELETE FROM clicks WHERE link_id = $1', [id]);
+    await query('DELETE FROM links WHERE id = $1', [id]);
+
+    res.json({ message: 'Link deleted' });
+  } catch (error) {
+    console.error('Delete link error:', error);
+    res.status(500).json({ error: 'Failed to delete link' });
+  }
+};
+
 export const archiveLinks = async (req, res) => {
   try {
     const { linkIds } = req.body;

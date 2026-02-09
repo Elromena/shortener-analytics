@@ -74,6 +74,9 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(data),
   }),
+  deleteLink: (linkId) => request(`/api/links/${linkId}`, {
+    method: 'DELETE',
+  }),
   archiveLinks: (linkIds) => request('/api/links/archive', {
     method: 'POST',
     body: JSON.stringify({ linkIds }),

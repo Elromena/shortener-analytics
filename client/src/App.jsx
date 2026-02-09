@@ -142,6 +142,15 @@ export default function App() {
     }
   };
 
+  const deleteLink = async (linkId) => {
+    try {
+      await api.deleteLink(linkId);
+      showNotification('Link deleted');
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  };
+
   const archiveLinks = async (linkIds) => {
     try {
       await api.archiveLinks(linkIds);
@@ -246,6 +255,7 @@ export default function App() {
             getFilteredLinks={getFilteredLinks}
             getTopPerformers={getTopPerformers}
             onArchiveLinks={archiveLinks}
+            onDeleteLink={deleteLink}
             onExportCSV={exportCSV}
             onTrackClick={trackClick}
             onDuplicateLink={duplicateLink}

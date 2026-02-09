@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getLinks,
   createLink,
+  deleteLink,
   archiveLinks,
   getTopPerformers,
   getPerformanceData
@@ -14,6 +15,7 @@ router.use(authenticateToken);
 
 router.get('/brand/:brandId', getLinks);
 router.post('/', createLink);
+router.delete('/:id', deleteLink);
 router.post('/archive', archiveLinks);
 router.get('/brand/:brandId/top-performers', getTopPerformers);
 router.get('/brand/:brandId/performance', getPerformanceData);
