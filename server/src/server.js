@@ -50,9 +50,7 @@ app.get('/health', (req, res) => {
 
 // Get app config (for frontend to know the app URL)
 app.get('/api/config', (req, res) => {
-  const protocol = req.protocol;
-  const host = req.get('host');
-  const appUrl = `${protocol}://${host}`;
+  const appUrl = process.env.CLIENT_URL || `${req.protocol}://${req.get('host')}`;
   res.json({ appUrl });
 });
 
