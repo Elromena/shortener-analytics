@@ -33,6 +33,7 @@ export default function DashboardView({
   onTrackClick,
   onDuplicateLink,
   onCreateLink,
+  onNavigate,
 }) {
   const [dateRange, setDateRange] = useState(30);
   const [chartMetrics, setChartMetrics] = useState({
@@ -175,6 +176,10 @@ export default function DashboardView({
       <header className="view-header">
         <h1>{brand.name} — Dashboard</h1>
         <div className="header-actions">
+          <button className="btn btn-ghost" onClick={() => window.location.href = '#team'} 
+                  onClick={(e) => { e.preventDefault(); onNavigate('team-management'); }}>
+            👥 Team
+          </button>
           <button className="btn btn-secondary" onClick={onExportCSV}>
             Export CSV
           </button>

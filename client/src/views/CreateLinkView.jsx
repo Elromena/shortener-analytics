@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
-const PLATFORMS = ['Twitter', 'LinkedIn', 'Facebook', 'Instagram'];
-const CONTENT_TYPES = ['Blog Post', 'Video', 'Infographic', 'Landing Page'];
+const PLATFORM_SUGGESTIONS = ['Twitter', 'LinkedIn', 'Facebook', 'Instagram', 'TikTok', 'YouTube', 'Reddit', 'Pinterest'];
+const CONTENT_TYPE_SUGGESTIONS = ['Blog Post', 'Video', 'Infographic', 'Landing Page', 'Podcast', 'Webinar', 'eBook', 'Case Study'];
 
 export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
   const [originalUrl, setOriginalUrl] = useState('');
   const [title, setTitle] = useState('');
-  const [platform, setPlatform] = useState(brand?.default_categories?.length ? 'Twitter' : 'Twitter');
+  const [platform, setPlatform] = useState('');
   const [category, setCategory] = useState(brand?.default_categories?.[0] || '');
-  const [contentType, setContentType] = useState('Blog Post');
+  const [contentType, setContentType] = useState('');
   const [tagsInput, setTagsInput] = useState(brand?.default_tags?.join(', ') || '');
   const [errors, setErrors] = useState({});
 
@@ -39,9 +39,9 @@ export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
       brand_id: brand.id,
       original_url: originalUrl.trim(),
       title: title.trim(),
-      platform: platform || 'Twitter',
+      platform: platform.trim() || 'Other',
       category: category || categories[0],
-      content_type: contentType || 'Blog Post',
+      content_type: contentType.trim() || 'Other',
       tags,
     });
   };
@@ -84,15 +84,19 @@ export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="platform">Platform</label>
-            <select
+            <input
               id="platform"
+              type="text"
+              list="platform-suggestions"
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
-            >
-              {PLATFORMS.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              placeholder="e.g. Twitter, LinkedIn, or type your own"
+            />
+            <datalist id="platform-suggestions">
+              {PLATFORM_SUGGESTIONS.map((p) => (
+                <option key={p} value={p} />
               ))}
-            </select>
+            </datalist>
           </div>
           <div className="form-group">
             <label htmlFor="category">Category</label>
@@ -109,15 +113,19 @@ export default function CreateLinkView({ brand, onCreateLink, onCancel }) {
         </div>
         <div className="form-group">
           <label htmlFor="contentType">Content Type</label>
-          <select
+          <input
             id="contentType"
+            type="text"
+            list="content-type-suggestions"
             value={contentType}
             onChange={(e) => setContentType(e.target.value)}
-          >
-            {CONTENT_TYPES.map((ct) => (
-              <option key={ct} value={ct}>{ct}</option>
+            placeholder="e.g. Blog Post, Video, or type your own"
+          />
+          <datalist id="content-type-suggestions">
+            {CONTENT_TYPE_SUGGESTIONS.map((ct) => (
+              <option key={ct} value={ct} />
             ))}
-          </select>
+          </datalist>
         </div>
         <div className="form-group">
           <label htmlFor="tags">Tags (comma-separated)</label>

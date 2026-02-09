@@ -708,6 +708,95 @@
   }
 }
 
+/* Team Management */
+.add-member-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.add-member-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.add-member-form .form-row {
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.members-section {
+  margin-bottom: 2rem;
+}
+
+.members-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.member-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.member-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.member-name {
+  font-weight: 500;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.owner-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--accent-muted);
+  color: var(--accent);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.member-email {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.member-meta {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.success-message {
+  padding: 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  color: var(--success);
+  font-size: 0.9rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .main {
@@ -734,5 +823,15 @@
   .links-table th:nth-child(n+4),
   .links-table td:nth-child(n+4) {
     display: none;
+  }
+
+  .member-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .add-member-form .form-row {
+    flex-direction: column;
   }
 }

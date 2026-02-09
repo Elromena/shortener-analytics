@@ -10,6 +10,7 @@ import CreateLinkView from './views/CreateLinkView';
 import DashboardView from './views/DashboardView';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
+import TeamManagementView from './views/TeamManagementView';
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
@@ -91,7 +92,7 @@ export default function App() {
   const createBrand = async (data) => {
     try {
       const { brand } = await api.createBrand(data);
-      setBrands((prev) => [brand, ...prev]);
+      await loadBrands(); // Reload all brands from server
       setSelectedBrand(brand);
       setCurrentView('dashboard');
       showNotification('Brand created successfully');
@@ -221,6 +222,7 @@ export default function App() {
             onTrackClick={trackClick}
             onDuplicateLink={duplicateLink}
             onCreateLink={() => setCurrentView('create-link')}
+            onNavigate={setCurrentView}
           />
         )}
         {currentView === 'create-link' && selectedBrand && (
@@ -228,6 +230,12 @@ export default function App() {
             brand={selectedBrand}
             onCreateLink={createLink}
             onCancel={() => setCurrentView('dashboard')}
+          />
+        )}
+        {currentView === 'team-management' && selectedBrand && (
+          <TeamManagementView
+            brand={selectedBrand}
+            onBack={() => setCurrentView('dashboard')}
           />
         )}
       </main>

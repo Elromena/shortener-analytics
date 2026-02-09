@@ -11,6 +11,7 @@ import brandRoutes from './routes/brands.js';
 import linkRoutes from './routes/links.js';
 import clickRoutes from './routes/clicks.js';
 import redirectRoutes from './routes/redirect.js';
+import teamRoutes from './routes/team.js';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/links', linkRoutes);
 app.use('/api/clicks', clickRoutes);
+app.use('/api/team', teamRoutes);
 
 // Public redirect route
 app.use('/r', redirectRoutes);

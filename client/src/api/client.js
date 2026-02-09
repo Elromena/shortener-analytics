@@ -85,6 +85,16 @@ export const api = {
     const token = getAuthToken();
     window.open(`${API_URL}/api/clicks/export/${brandId}?token=${token}`, '_blank');
   },
+
+  // Team Management
+  getBrandMembers: (brandId) => request(`/api/team/brand/${brandId}/members`),
+  addBrandMember: (brandId, email, role) => request(`/api/team/brand/${brandId}/members`, {
+    method: 'POST',
+    body: JSON.stringify({ email, role }),
+  }),
+  removeBrandMember: (brandId, memberId) => request(`/api/team/brand/${brandId}/members/${memberId}`, {
+    method: 'DELETE',
+  }),
 };
 
 export const setAuthToken = (token) => {

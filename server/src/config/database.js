@@ -36,6 +36,18 @@ export const initDatabase = async () => {
       )
     `);
 
+    // Brand members table (for team collaboration)
+    await query(`
+      CREATE TABLE IF NOT EXISTS brand_members (
+        id SERIAL PRIMARY KEY,
+        brand_id INTEGER REFERENCES brands(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        role VARCHAR(50) DEFAULT 'member',
+        added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(brand_id, user_id)
+      )
+    `);
+
     // Links table
     await query(`
       CREATE TABLE IF NOT EXISTS links (
@@ -66,6 +78,9 @@ export const initDatabase = async () => {
     `);
 
     // Create indexes for performance
+    await query(`CREATE INDEX IF NOT EXISTS idx_brands_user_id ON brands(user_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_brand_members_brand_id ON brand_members(brand_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_brand_members_user_id ON brand_members(user_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_links_brand_id ON links(brand_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_links_short_code ON links(short_code)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_clicks_link_id ON clicks(link_id)`);

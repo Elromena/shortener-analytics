@@ -2,8 +2,14 @@ import { query } from '../config/database.js';
 
 export const getBrands = async (req, res) => {
   try {
+    // Get brands owned by user or brands they're a member of
     const result = await query(
-      'SELECT * FROM brands WHERE user_id = $1 ORDER BY created_at DESC',
+      `SELECT DISTINCT b.*, 
+              CASE WHEN b.user_id = $1 THEN true ELSE false END as is_owner
+       FROM brands b
+       LEFT JOIN brand_members bm ON b.id = bm.brand_id
+       WHERE b.user_id = $1 OR bm.user_id = $1
+       ORDER BY b.created_at DESC`,
       [req.user.id]
     );
     res.json({ brands: result.rows });
