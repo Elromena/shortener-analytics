@@ -21,7 +21,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 const isProduction = process.env.NODE_ENV === 'production';
-const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`;
 
 // Middleware
 app.use(cors({
@@ -51,7 +50,10 @@ app.get('/health', (req, res) => {
 
 // Get app config (for frontend to know the app URL)
 app.get('/api/config', (req, res) => {
-  res.json({ appUrl: APP_URL });
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const appUrl = `${protocol}://${host}`;
+  res.json({ appUrl });
 });
 
 // Serve static files in production

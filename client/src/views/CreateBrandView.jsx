@@ -88,16 +88,16 @@ export default function CreateBrandView({ onCreateBrand, onCancel }) {
           {errors.slug && <span className="form-error">{errors.slug}</span>}
         </div>
         <div className="form-group">
-          <label htmlFor="domain">Display Domain (Optional)</label>
+          <label htmlFor="domain">Client/Brand Domain (Optional)</label>
           <input
             id="domain"
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            placeholder="e.g. blockchain-ads.com (for display only)"
+            placeholder="e.g. nexus.com, acme.io (for identification only)"
           />
           <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-            Short URLs will use the app domain. This is just for display/branding.
+            Helps identify which client/brand this is. Short links use your app domain.
           </small>
           {errors.domain && <span className="form-error">{errors.domain}</span>}
         </div>
