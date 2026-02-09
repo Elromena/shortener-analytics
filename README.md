@@ -11,7 +11,9 @@ A production-ready link management and analytics platform with PostgreSQL, Expre
 
 ### Core Features
 - **Multi-Brand Management** — Unlimited brands with unique slugs and domains
+- **Team Collaboration** — Add team members to brands with role-based access
 - **Link Creation** — Auto-generated or custom short codes with metadata
+- **Custom Platforms & Content Types** — Not limited to presets - type your own!
 - **Flexible Analytics** — Google Search Console-style chart with toggleable metrics
 - **Click Tracking** — Public redirect endpoints that track and redirect
 - **Search & Filtering** — Full-text search, platform/category filters, sorting, pagination
@@ -202,15 +204,34 @@ clicks (id, link_id, ip_address, user_agent, referrer, clicked_at)
 
 ## 🤝 Team Collaboration
 
-### Adding Team Members
-1. They create an account (register)
-2. They log in and can create their own brands
-3. OR you can implement team invites (future enhancement)
+### Adding Team Members to Your Brand
+
+1. **Create a brand** (you become the owner)
+2. Click the **👥 Team** button in the brand dashboard
+3. Enter a teammate's **email address** (they must have an account)
+4. Select their **role** (Member or Admin)
+5. Click **Add Member**
+6. They can now access the brand and all its links!
+
+### Team Member Roles
+
+- **Owner** — Creates the brand, full control, can add/remove members
+- **Admin** — Can manage links and view analytics (future: more permissions)
+- **Member** — Can view links and analytics
+
+### What Team Members Can Do
+
+- ✅ View all links in the brand
+- ✅ See real-time analytics and charts
+- ✅ Create new links
+- ✅ Archive links
+- ✅ Export CSV reports
+- ❌ Only owners can add/remove team members
 
 ### Sharing Data
 - All links and analytics are stored in PostgreSQL
-- Any team member can log in and see their brands
-- Real-time updates reflected across all sessions
+- Team members see the same data in real-time
+- No need to share credentials - everyone has their own account
 
 ## 🆚 localStorage vs PostgreSQL
 
