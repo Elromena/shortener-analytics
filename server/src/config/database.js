@@ -3,13 +3,25 @@ const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectionTimeoutMillis: 10000,   // 10 second connection timeout
+  idleTimeoutMillis: 30000,         // Close idle connections after 30s
+  max: 10,                          // Max 10 connections
+});
+
+pool.on('error', (err) => {
+  console.error('Unexpected database pool error:', err);
 });
 
 export const query = (text, params) => pool.query(text, params);
 
 export const initDatabase = async () => {
   try {
+    // Test connection first
+    const client = await pool.connect();
+    console.log('✅ Database connected');
+    client.release();
+
     // Users table
     await query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -29,7 +41,7 @@ export const initDatabase = async () => {
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         name VARCHAR(255) NOT NULL,
         slug VARCHAR(100) UNIQUE NOT NULL,
-        domain VARCHAR(255) NOT NULL,
+        domain VARCHAR(255) DEFAULT '',
         default_categories TEXT[] DEFAULT '{}',
         default_tags TEXT[] DEFAULT '{}',
         default_platforms TEXT[] DEFAULT '{}',
@@ -95,9 +107,9 @@ export const initDatabase = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_clicks_link_id ON clicks(link_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_clicks_clicked_at ON clicks(clicked_at)`);
 
-    console.log('✅ Database initialized successfully');
+    console.log('✅ Database tables initialized');
   } catch (error) {
-    console.error('❌ Database initialization error:', error);
+    console.error('❌ Database initialization error:', error.message);
     throw error;
   }
 };

@@ -70,18 +70,34 @@ if (isProduction) {
 
 // Initialize database and start server
 const startServer = async () => {
-  try {
-    await initDatabase();
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-      if (isProduction) {
-        console.log(`📦 Serving static files from client/dist`);
+  // Start the server immediately so Railway sees a healthy process
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    if (isProduction) {
+      console.log(`📦 Serving static files from client/dist`);
+    }
+  });
+
+  // Then connect to database with retries
+  const maxRetries = 5;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 Database connection attempt ${attempt}/${maxRetries}...`);
+      await initDatabase();
+      console.log('✅ Database ready');
+      return;
+    } catch (error) {
+      console.error(`❌ Attempt ${attempt} failed:`, error.message);
+      if (attempt < maxRetries) {
+        const waitTime = attempt * 3000; // 3s, 6s, 9s, 12s, 15s
+        console.log(`⏳ Retrying in ${waitTime / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      } else {
+        console.error('❌ All database connection attempts failed. Server running without database.');
+        console.error('Check your DATABASE_URL environment variable.');
       }
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
+    }
   }
 };
 
