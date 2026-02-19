@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -8,18 +8,18 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
 const CHART_COLORS = {
-  total: '#6366f1',
-  Twitter: '#1da1f2',
-  LinkedIn: '#0a66c2',
-  Facebook: '#1877f2',
-  Instagram: '#e4405f',
-  Gaming: '#22c55e',
-  Fintech: '#f59e0b',
-  Advertising: '#8b5cf6',
-  'Mobile Apps': '#ec4899',
+  total: "#6366f1",
+  Twitter: "#1da1f2",
+  LinkedIn: "#0a66c2",
+  Facebook: "#1877f2",
+  Instagram: "#e4405f",
+  Gaming: "#22c55e",
+  Fintech: "#f59e0b",
+  Advertising: "#8b5cf6",
+  "Mobile Apps": "#ec4899",
 };
 
 export default function DashboardView({
@@ -43,11 +43,11 @@ export default function DashboardView({
     byPlatform: false,
     byCategory: false,
   });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [platformFilter, setPlatformFilter] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [platformFilter, setPlatformFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [sortBy, setSortBy] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedLinks, setSelectedLinks] = useState(new Set());
@@ -57,6 +57,7 @@ export default function DashboardView({
   const [filteredLinks, setFilteredLinks] = useState([]);
   const [topPerformers, setTopPerformers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [linkId, setLinkId] = useState("");
 
   useEffect(() => {
     loadStats();
@@ -64,11 +65,18 @@ export default function DashboardView({
 
   useEffect(() => {
     loadChartData();
-  }, [brand.id, dateRange, chartMetrics]);
+  }, [brand.id, dateRange, chartMetrics, linkId]);
 
   useEffect(() => {
     loadLinks();
-  }, [brand.id, searchQuery, platformFilter, categoryFilter, sortBy, sortOrder]);
+  }, [
+    brand.id,
+    searchQuery,
+    platformFilter,
+    categoryFilter,
+    sortBy,
+    sortOrder,
+  ]);
 
   useEffect(() => {
     loadTopPerformers();
@@ -80,7 +88,12 @@ export default function DashboardView({
   };
 
   const loadChartData = async () => {
-    const data = await getPerformanceChartData(brand.id, dateRange, chartMetrics);
+    const data = await getPerformanceChartData(
+      brand.id,
+      dateRange,
+      chartMetrics,
+      linkId,
+    );
     setChartData(data);
   };
 
@@ -105,13 +118,13 @@ export default function DashboardView({
   const totalPages = Math.ceil(filteredLinks.length / itemsPerPage);
   const paginatedLinks = filteredLinks.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const categories = brand?.default_categories?.length
     ? brand.default_categories
-    : ['Gaming', 'Fintech', 'Advertising', 'Mobile Apps'];
-  const platforms = ['Twitter', 'LinkedIn', 'Facebook', 'Instagram'];
+    : ["Gaming", "Fintech", "Advertising", "Mobile Apps"];
+  const platforms = ["Twitter", "LinkedIn", "Facebook", "Instagram"];
 
   const toggleChartMetric = (key) => {
     setChartMetrics((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -163,12 +176,21 @@ export default function DashboardView({
 
   const chartLines = (() => {
     const lines = [];
-    if (chartMetrics.total) lines.push({ key: 'total', label: 'Total Clicks', color: CHART_COLORS.total });
+    if (chartMetrics.total)
+      lines.push({
+        key: "total",
+        label: "Total Clicks",
+        color: CHART_COLORS.total,
+      });
     if (chartMetrics.byPlatform) {
-      platforms.forEach((p) => lines.push({ key: p, label: p, color: CHART_COLORS[p] || '#9ca3af' }));
+      platforms.forEach((p) =>
+        lines.push({ key: p, label: p, color: CHART_COLORS[p] || "#9ca3af" }),
+      );
     }
     if (chartMetrics.byCategory) {
-      categories.forEach((c) => lines.push({ key: c, label: c, color: CHART_COLORS[c] || '#9ca3af' }));
+      categories.forEach((c) =>
+        lines.push({ key: c, label: c, color: CHART_COLORS[c] || "#9ca3af" }),
+      );
     }
     return lines;
   })();
@@ -178,12 +200,22 @@ export default function DashboardView({
       <header className="view-header">
         <h1>{brand.name} — Dashboard</h1>
         <div className="header-actions">
-          <button className="btn btn-ghost" 
-                  onClick={(e) => { e.preventDefault(); onNavigate('brand-settings'); }}>
+          <button
+            className="btn btn-ghost"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("brand-settings");
+            }}
+          >
             ⚙️ Settings
           </button>
-          <button className="btn btn-ghost" 
-                  onClick={(e) => { e.preventDefault(); onNavigate('team-management'); }}>
+          <button
+            className="btn btn-ghost"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("team-management");
+            }}
+          >
             👥 Team
           </button>
           <button className="btn btn-secondary" onClick={onExportCSV}>
@@ -207,7 +239,9 @@ export default function DashboardView({
         <div className="stat-card">
           <span className="stat-label">Avg per Link</span>
           <span className="stat-value">
-            {stats.activeLinks > 0 ? Math.round(stats.totalClicks / stats.activeLinks) : 0}
+            {stats.activeLinks > 0
+              ? Math.round(stats.totalClicks / stats.activeLinks)
+              : 0}
           </span>
         </div>
       </section>
@@ -220,7 +254,7 @@ export default function DashboardView({
               {[7, 30, 60, 90].map((days) => (
                 <button
                   key={days}
-                  className={`btn btn-sm ${dateRange === days ? 'active' : 'btn-ghost'}`}
+                  className={`btn btn-sm ${dateRange === days ? "active" : "btn-ghost"}`}
                   onClick={() => setDateRange(days)}
                 >
                   {days}d
@@ -232,7 +266,7 @@ export default function DashboardView({
                 <input
                   type="checkbox"
                   checked={chartMetrics.total}
-                  onChange={() => toggleChartMetric('total')}
+                  onChange={() => toggleChartMetric("total")}
                 />
                 Total Clicks
               </label>
@@ -240,7 +274,7 @@ export default function DashboardView({
                 <input
                   type="checkbox"
                   checked={chartMetrics.byPlatform}
-                  onChange={() => toggleChartMetric('byPlatform')}
+                  onChange={() => toggleChartMetric("byPlatform")}
                 />
                 By Platform
               </label>
@@ -248,7 +282,7 @@ export default function DashboardView({
                 <input
                   type="checkbox"
                   checked={chartMetrics.byCategory}
-                  onChange={() => toggleChartMetric('byCategory')}
+                  onChange={() => toggleChartMetric("byCategory")}
                 />
                 By Category
               </label>
@@ -257,7 +291,10 @@ export default function DashboardView({
         </div>
         <div className="chart-container">
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="date"
@@ -267,11 +304,11 @@ export default function DashboardView({
               <YAxis stroke="var(--text-secondary)" tick={{ fontSize: 12 }} />
               <Tooltip
                 contentStyle={{
-                  background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
+                  background: "var(--bg-tertiary)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius)",
                 }}
-                labelStyle={{ color: 'var(--text-primary)' }}
+                labelStyle={{ color: "var(--text-primary)" }}
               />
               <Legend />
               {chartLines.map(({ key, label, color }) => (
@@ -305,6 +342,12 @@ export default function DashboardView({
               </div>
               <button
                 className="btn btn-sm btn-ghost"
+                onClick={() => setLinkId(link.id)}
+              >
+                Metrics
+              </button>
+              <button
+                className="btn btn-sm btn-ghost"
                 onClick={() => copyShortUrl(link)}
               >
                 Copy
@@ -321,10 +364,7 @@ export default function DashboardView({
         <div className="links-header">
           <h2>All Links</h2>
           {selectedLinks.size > 0 && (
-            <button
-              className="btn btn-warning"
-              onClick={handleArchiveSelected}
-            >
+            <button className="btn btn-warning" onClick={handleArchiveSelected}>
               Archive Selected ({selectedLinks.size})
             </button>
           )}
@@ -350,7 +390,9 @@ export default function DashboardView({
           >
             <option value="">All Platforms</option>
             {platforms.map((p) => (
-              <option key={p} value={p}>{p}</option>
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
           </select>
           <select
@@ -362,13 +404,12 @@ export default function DashboardView({
           >
             <option value="">All Categories</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="created_at">Date</option>
             <option value="title">Title</option>
             <option value="clicks">Clicks</option>
@@ -419,9 +460,12 @@ export default function DashboardView({
             </thead>
             <tbody>
               {paginatedLinks.map((link) => (
-                <tr key={link.id} className={link.status === 'archived' ? 'archived' : ''}>
+                <tr
+                  key={link.id}
+                  className={link.status === "archived" ? "archived" : ""}
+                >
                   <td>
-                    {link.status === 'active' && (
+                    {link.status === "active" && (
                       <input
                         type="checkbox"
                         checked={selectedLinks.has(link.id)}
@@ -432,7 +476,9 @@ export default function DashboardView({
                   <td>{link.title}</td>
                   <td>
                     <code className="short-url">
-                      {appUrl ? `${appUrl}/r/${brand.slug}/${link.short_code}` : 'Loading...'}
+                      {appUrl
+                        ? `${appUrl}/r/${brand.slug}/${link.short_code}`
+                        : "Loading..."}
                     </code>
                   </td>
                   <td>{link.platform}</td>
@@ -458,7 +504,7 @@ export default function DashboardView({
                       >
                         Test
                       </button>
-                      {link.status === 'active' && (
+                      {link.status === "active" && (
                         <button
                           className="btn btn-sm btn-ghost"
                           onClick={() => onDuplicateLink(link)}
@@ -468,9 +514,13 @@ export default function DashboardView({
                       )}
                       <button
                         className="btn btn-sm btn-ghost"
-                        style={{ color: 'var(--error)' }}
+                        style={{ color: "var(--error)" }}
                         onClick={() => {
-                          if (confirm(`Delete "${link.title}"? This cannot be undone.`)) {
+                          if (
+                            confirm(
+                              `Delete "${link.title}"? This cannot be undone.`,
+                            )
+                          ) {
                             onDeleteLink(link.id).then(() => loadLinks());
                           }
                         }}
@@ -517,7 +567,10 @@ export default function DashboardView({
               no longer appear in active links but can be reactivated later.
             </p>
             <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={() => setShowArchiveConfirm(false)}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setShowArchiveConfirm(false)}
+              >
                 Cancel
               </button>
               <button className="btn btn-warning" onClick={confirmArchive}>

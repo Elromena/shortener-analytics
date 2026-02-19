@@ -1,17 +1,17 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { initDatabase } from './config/database.js';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import { initDatabase } from "./config/database.js";
 
 // Routes
-import authRoutes from './routes/auth.js';
-import brandRoutes from './routes/brands.js';
-import linkRoutes from './routes/links.js';
-import clickRoutes from './routes/clicks.js';
-import redirectRoutes from './routes/redirect.js';
-import teamRoutes from './routes/team.js';
+import authRoutes from "./routes/auth.js";
+import brandRoutes from "./routes/brands.js";
+import linkRoutes from "./routes/links.js";
+import clickRoutes from "./routes/clicks.js";
+import redirectRoutes from "./routes/redirect.js";
+import teamRoutes from "./routes/team.js";
 
 dotenv.config();
 
@@ -20,51 +20,54 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 
 // Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Trust proxy for Railway
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/brands', brandRoutes);
-app.use('/api/links', linkRoutes);
-app.use('/api/clicks', clickRoutes);
-app.use('/api/team', teamRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/brands", brandRoutes);
+app.use("/api/links", linkRoutes);
+app.use("/api/clicks", clickRoutes);
+app.use("/api/team", teamRoutes);
 
 // Public redirect route
-app.use('/r', redirectRoutes);
+app.use("/r", redirectRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // Get app config (for frontend to know the app URL)
-app.get('/api/config', (req, res) => {
-  const appUrl = process.env.CLIENT_URL || `${req.protocol}://${req.get('host')}`;
+app.get("/api/config", (req, res) => {
+  const appUrl =
+    process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`;
   res.json({ appUrl });
 });
 
 // Serve static files in production
 if (isProduction) {
-  const clientBuildPath = path.join(__dirname, '../../client/dist');
+  const clientBuildPath = path.join(__dirname, "../../client/dist");
   app.use(express.static(clientBuildPath));
-  
-  app.get('*', (req, res) => {
+
+  app.get("*", (req, res) => {
     // Don't serve index.html for API routes or redirect routes
-    if (req.path.startsWith('/api') || req.path.startsWith('/r')) {
-      return res.status(404).json({ error: 'Not found' });
+    if (req.path.startsWith("/api") || req.path.startsWith("/r")) {
+      return res.status(404).json({ error: "Not found" });
     }
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
+    res.sendFile(path.join(clientBuildPath, "index.html"));
   });
 }
 
@@ -73,7 +76,7 @@ const startServer = async () => {
   // Start the server immediately so Railway sees a healthy process
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
     if (isProduction) {
       console.log(`📦 Serving static files from client/dist`);
     }
@@ -84,18 +87,22 @@ const startServer = async () => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔄 Database connection attempt ${attempt}/${maxRetries}...`);
+      console.log(process.env.DATABASE_URL);
+
       await initDatabase();
-      console.log('✅ Database ready');
+      console.log("✅ Database ready");
       return;
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed:`, error.message);
       if (attempt < maxRetries) {
         const waitTime = attempt * 3000; // 3s, 6s, 9s, 12s, 15s
         console.log(`⏳ Retrying in ${waitTime / 1000}s...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       } else {
-        console.error('❌ All database connection attempts failed. Server running without database.');
-        console.error('Check your DATABASE_URL environment variable.');
+        console.error(
+          "❌ All database connection attempts failed. Server running without database.",
+        );
+        console.error("Check your DATABASE_URL environment variable.");
       }
     }
   }

@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import { api } from './api/client';
-import { useAuth } from './contexts/AuthContext';
-import Navigation from './components/Navigation';
-import Notification from './components/Notification';
-import BrandsView from './views/BrandsView';
-import CreateBrandView from './views/CreateBrandView';
-import CreateLinkView from './views/CreateLinkView';
-import DashboardView from './views/DashboardView';
-import LoginView from './views/LoginView';
-import RegisterView from './views/RegisterView';
-import TeamManagementView from './views/TeamManagementView';
-import BrandSettingsView from './views/BrandSettingsView';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import { api } from "./api/client";
+import { useAuth } from "./contexts/AuthContext";
+import Navigation from "./components/Navigation";
+import Notification from "./components/Notification";
+import BrandsView from "./views/BrandsView";
+import CreateBrandView from "./views/CreateBrandView";
+import CreateLinkView from "./views/CreateLinkView";
+import DashboardView from "./views/DashboardView";
+import LoginView from "./views/LoginView";
+import RegisterView from "./views/RegisterView";
+import TeamManagementView from "./views/TeamManagementView";
+import BrandSettingsView from "./views/BrandSettingsView";
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
   const [brands, setBrands] = useState([]);
-  const [currentView, setCurrentView] = useState('brands');
+  const [currentView, setCurrentView] = useState("brands");
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [notification, setNotification] = useState(null);
-  const [authView, setAuthView] = useState('login'); // 'login' or 'register'
+  const [authView, setAuthView] = useState("login"); // 'login' or 'register'
   const [loading, setLoading] = useState(false);
-  const [appUrl, setAppUrl] = useState('');
+  const [appUrl, setAppUrl] = useState("");
 
   useEffect(() => {
     loadConfig();
@@ -38,7 +38,7 @@ export default function App() {
       const { appUrl } = await api.getConfig();
       setAppUrl(appUrl);
     } catch (error) {
-      console.error('Failed to load config:', error);
+      console.error("Failed to load config:", error);
     }
   };
 
@@ -48,13 +48,13 @@ export default function App() {
       const { brands } = await api.getBrands();
       setBrands(brands);
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const showNotification = (message, type = 'success') => {
+  const showNotification = (message, type = "success") => {
     setNotification({ message, type });
   };
 
@@ -63,17 +63,27 @@ export default function App() {
       const stats = await api.getBrandStats(brandId, dateRange);
       return stats;
     } catch (error) {
-      console.error('Get brand stats error:', error);
+      console.error("Get brand stats error:", error);
       return { totalClicks: 0, activeLinks: 0 };
     }
   };
 
-  const getPerformanceChartData = async (brandId, dateRange, chartMetrics) => {
+  const getPerformanceChartData = async (
+    brandId,
+    dateRange,
+    chartMetrics,
+    linkId,
+  ) => {
     try {
-      const { data } = await api.getPerformanceData(brandId, dateRange, chartMetrics);
+      const { data } = await api.getPerformanceData(
+        brandId,
+        dateRange,
+        chartMetrics,
+        linkId,
+      );
       return data;
     } catch (error) {
-      console.error('Get performance data error:', error);
+      console.error("Get performance data error:", error);
       return [];
     }
   };
@@ -89,7 +99,7 @@ export default function App() {
       });
       return links;
     } catch (error) {
-      console.error('Get links error:', error);
+      console.error("Get links error:", error);
       return [];
     }
   };
@@ -99,7 +109,7 @@ export default function App() {
       const { links } = await api.getTopPerformers(brandId, limit, dateRange);
       return links;
     } catch (error) {
-      console.error('Get top performers error:', error);
+      console.error("Get top performers error:", error);
       return [];
     }
   };
@@ -109,10 +119,10 @@ export default function App() {
       const { brand } = await api.createBrand(data);
       await loadBrands(); // Reload all brands from server
       setSelectedBrand(brand);
-      setCurrentView('dashboard');
-      showNotification('Brand created successfully');
+      setCurrentView("dashboard");
+      showNotification("Brand created successfully");
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     }
   };
 
@@ -121,10 +131,10 @@ export default function App() {
       const { brand } = await api.updateBrand(brandId, data);
       await loadBrands(); // Reload all brands from server
       setSelectedBrand(brand);
-      showNotification('Brand updated successfully');
+      showNotification("Brand updated successfully");
       return true;
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
       return false;
     }
   };
@@ -135,19 +145,19 @@ export default function App() {
       const brand = brands.find((b) => b.id === selectedBrand.id);
       const shortUrl = `${appUrl}/r/${brand.slug}/${link.short_code}`;
       navigator.clipboard.writeText(shortUrl);
-      showNotification('Link created! Short URL copied to clipboard.');
-      setCurrentView('dashboard');
+      showNotification("Link created! Short URL copied to clipboard.");
+      setCurrentView("dashboard");
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     }
   };
 
   const deleteLink = async (linkId) => {
     try {
       await api.deleteLink(linkId);
-      showNotification('Link deleted');
+      showNotification("Link deleted");
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     }
   };
 
@@ -156,16 +166,16 @@ export default function App() {
       await api.archiveLinks(linkIds);
       showNotification(`${linkIds.length} link(s) archived`);
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     }
   };
 
   const trackClick = async (linkId) => {
     try {
       await api.trackClick(linkId);
-      showNotification('Test click recorded');
+      showNotification("Test click recorded");
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     }
   };
 
@@ -184,20 +194,20 @@ export default function App() {
       const brand = brands.find((b) => b.id === selectedBrand.id);
       const shortUrl = `${appUrl}/r/${brand.slug}/${created.short_code}`;
       navigator.clipboard.writeText(shortUrl);
-      showNotification('Link duplicated! Short URL copied.');
+      showNotification("Link duplicated! Short URL copied.");
     } catch (error) {
-      showNotification(error.message, 'error');
+      showNotification(error.message, "error");
     }
   };
 
   const exportCSV = () => {
     api.exportCSV(selectedBrand.id);
-    showNotification('CSV exported');
+    showNotification("CSV exported");
   };
 
   const handleNavigate = (view) => {
     setCurrentView(view);
-    if (view === 'brands') {
+    if (view === "brands") {
       setSelectedBrand(null);
     }
   };
@@ -213,10 +223,10 @@ export default function App() {
   if (!user) {
     return (
       <div className="app">
-        {authView === 'login' ? (
-          <LoginView onSwitchToRegister={() => setAuthView('register')} />
+        {authView === "login" ? (
+          <LoginView onSwitchToRegister={() => setAuthView("register")} />
         ) : (
-          <RegisterView onSwitchToLogin={() => setAuthView('login')} />
+          <RegisterView onSwitchToLogin={() => setAuthView("login")} />
         )}
       </div>
     );
@@ -230,24 +240,24 @@ export default function App() {
         onNavigate={handleNavigate}
       />
       <main className="main">
-        {currentView === 'brands' && (
+        {currentView === "brands" && (
           <BrandsView
             brands={brands}
             getBrandStats={getBrandStats}
             onSelectBrand={(b) => {
               setSelectedBrand(b);
-              setCurrentView('dashboard');
+              setCurrentView("dashboard");
             }}
-            onCreateBrand={() => setCurrentView('create-brand')}
+            onCreateBrand={() => setCurrentView("create-brand")}
           />
         )}
-        {currentView === 'create-brand' && (
+        {currentView === "create-brand" && (
           <CreateBrandView
             onCreateBrand={createBrand}
-            onCancel={() => setCurrentView('brands')}
+            onCancel={() => setCurrentView("brands")}
           />
         )}
-        {currentView === 'dashboard' && selectedBrand && (
+        {currentView === "dashboard" && selectedBrand && (
           <DashboardView
             brand={selectedBrand}
             getBrandStats={getBrandStats}
@@ -259,29 +269,29 @@ export default function App() {
             onExportCSV={exportCSV}
             onTrackClick={trackClick}
             onDuplicateLink={duplicateLink}
-            onCreateLink={() => setCurrentView('create-link')}
+            onCreateLink={() => setCurrentView("create-link")}
             onNavigate={setCurrentView}
             appUrl={appUrl}
           />
         )}
-        {currentView === 'create-link' && selectedBrand && (
+        {currentView === "create-link" && selectedBrand && (
           <CreateLinkView
             brand={selectedBrand}
             onCreateLink={createLink}
-            onCancel={() => setCurrentView('dashboard')}
+            onCancel={() => setCurrentView("dashboard")}
           />
         )}
-        {currentView === 'team-management' && selectedBrand && (
+        {currentView === "team-management" && selectedBrand && (
           <TeamManagementView
             brand={selectedBrand}
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => setCurrentView("dashboard")}
           />
         )}
-        {currentView === 'brand-settings' && selectedBrand && (
+        {currentView === "brand-settings" && selectedBrand && (
           <BrandSettingsView
             brand={selectedBrand}
             onUpdateBrand={updateBrand}
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => setCurrentView("dashboard")}
           />
         )}
       </main>

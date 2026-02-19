@@ -1,16 +1,21 @@
-import pg from 'pg';
+import pg from "pg";
+// import dotenv from "dotenv";
+// dotenv.config();
 const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  connectionTimeoutMillis: 10000,   // 10 second connection timeout
-  idleTimeoutMillis: 30000,         // Close idle connections after 30s
-  max: 10,                          // Max 10 connections
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
+  connectionTimeoutMillis: 10000, // 10 second connection timeout
+  idleTimeoutMillis: 30000, // Close idle connections after 30s
+  max: 10, // Max 10 connections
 });
 
-pool.on('error', (err) => {
-  console.error('Unexpected database pool error:', err);
+pool.on("error", (err) => {
+  console.error("Unexpected database pool error:", err);
 });
 
 export const query = (text, params) => pool.query(text, params);
@@ -19,7 +24,7 @@ export const initDatabase = async () => {
   try {
     // Test connection first
     const client = await pool.connect();
-    console.log('✅ Database connected');
+    console.log("✅ Database connected");
     client.release();
 
     // Users table
@@ -99,17 +104,31 @@ export const initDatabase = async () => {
     `);
 
     // Create indexes for performance
-    await query(`CREATE INDEX IF NOT EXISTS idx_brands_user_id ON brands(user_id)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_brand_members_brand_id ON brand_members(brand_id)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_brand_members_user_id ON brand_members(user_id)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_links_brand_id ON links(brand_id)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_links_short_code ON links(short_code)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_clicks_link_id ON clicks(link_id)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_clicks_clicked_at ON clicks(clicked_at)`);
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_brands_user_id ON brands(user_id)`,
+    );
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_brand_members_brand_id ON brand_members(brand_id)`,
+    );
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_brand_members_user_id ON brand_members(user_id)`,
+    );
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_links_brand_id ON links(brand_id)`,
+    );
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_links_short_code ON links(short_code)`,
+    );
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_clicks_link_id ON clicks(link_id)`,
+    );
+    await query(
+      `CREATE INDEX IF NOT EXISTS idx_clicks_clicked_at ON clicks(clicked_at)`,
+    );
 
-    console.log('✅ Database tables initialized');
+    console.log("✅ Database tables initialized");
   } catch (error) {
-    console.error('❌ Database initialization error:', error.message);
+    console.error("❌ Database initialization error:", error.message);
     throw error;
   }
 };
