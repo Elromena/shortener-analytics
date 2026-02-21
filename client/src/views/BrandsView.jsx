@@ -1,7 +1,34 @@
-import React from 'react';
-import { formatDate } from '../utils';
+import { useEffect, useState } from "react";
+import { formatDate } from "../utils";
 
-export default function BrandsView({ brands, getBrandStats, onSelectBrand, onCreateBrand }) {
+export default function BrandsView({
+  brands,
+  getBrandStats,
+  onSelectBrand,
+  onCreateBrand,
+}) {
+  const [brandStats, setBrandStats] = useState({});
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const results = await Promise.all(
+        brands.map(async (brand) => {
+          const stats = await getBrandStats(brand.id);
+          return { id: brand.id, stats };
+        }),
+      );
+
+      const statsMap = {};
+      results.forEach(({ id, stats }) => {
+        statsMap[id] = stats;
+      });
+
+      setBrandStats(statsMap);
+    };
+
+    fetchStats();
+  }, [brands]);
+
   return (
     <div className="view brands-view">
       <header className="view-header">
@@ -12,7 +39,8 @@ export default function BrandsView({ brands, getBrandStats, onSelectBrand, onCre
       </header>
       <div className="brands-grid">
         {brands.map((brand) => {
-          const stats = getBrandStats(brand.id);
+          const stats = brandStats[brand.id];
+
           return (
             <article key={brand.id} className="brand-card">
               <div className="brand-card-header">
@@ -21,10 +49,12 @@ export default function BrandsView({ brands, getBrandStats, onSelectBrand, onCre
               </div>
               <p className="brand-domain">{brand.domain}</p>
               <div className="brand-stats">
-                <span>{stats.totalClicks} clicks</span>
-                <span>{stats.activeLinks} active links</span>
+                <span>{stats?.totalClicks} clicks</span>
+                <span>{stats?.activeLinks} active links</span>
               </div>
-              <p className="brand-created">Created {formatDate(brand.created_at)}</p>
+              <p className="brand-created">
+                Created {formatDate(brand.created_at)}
+              </p>
               <div className="brand-card-actions">
                 <button
                   className="btn btn-secondary"

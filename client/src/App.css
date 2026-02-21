@@ -69,7 +69,9 @@
   font-size: 0.9rem;
   font-weight: 500;
   border: none;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .btn-primary {
@@ -371,6 +373,10 @@
   padding: 0.75rem;
   background: var(--bg-tertiary);
   border-radius: var(--radius-sm);
+}
+
+.top-performer-item-active {
+  background: var(--accent-muted);
 }
 
 .top-performer-item .rank {
@@ -831,8 +837,8 @@
     flex-direction: column;
   }
 
-  .links-table th:nth-child(n+4),
-  .links-table td:nth-child(n+4) {
+  .links-table th:nth-child(n + 4),
+  .links-table td:nth-child(n + 4) {
     display: none;
   }
 

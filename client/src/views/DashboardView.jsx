@@ -332,7 +332,10 @@ export default function DashboardView({
         <h2>Top Performers</h2>
         <div className="top-performers-list">
           {topPerformers.map((link, i) => (
-            <div key={link.id} className="top-performer-item">
+            <div
+              key={link.id}
+              className={`top-performer-item ${linkId === link?.id && "top-performer-item-active"}`}
+            >
               <span className="rank">#{i + 1}</span>
               <div className="info">
                 <span className="title">{link.title}</span>
@@ -342,7 +345,7 @@ export default function DashboardView({
               </div>
               <button
                 className="btn btn-sm btn-ghost"
-                onClick={() => setLinkId(link.id)}
+                onClick={() => setLinkId(linkId === link.id ? "" : link.id)}
               >
                 Metrics
               </button>

@@ -21,8 +21,16 @@ export const getLinks = async (req, res) => {
     } = req.query;
 
     // Verify brand ownership
+    // const brandResult = await query(
+    //   "SELECT id FROM brands WHERE id = $1 AND user_id = $2",
+    //   [brandId, req.user.id],
+    // );
     const brandResult = await query(
-      "SELECT id FROM brands WHERE id = $1 AND user_id = $2",
+      `SELECT DISTINCT b.*, 
+          CASE WHEN b.user_id = $2 THEN true ELSE false END as is_owner
+   FROM brands b
+   LEFT JOIN brand_members bm ON b.id = bm.brand_id
+   WHERE b.id = $1 AND (b.user_id = $2 OR bm.user_id = $2)`,
       [brandId, req.user.id],
     );
 
@@ -212,8 +220,17 @@ export const getTopPerformers = async (req, res) => {
     const { limit = 5, dateRange = 30 } = req.query;
 
     // Verify brand ownership
+    // const brandResult = await query(
+    //   "SELECT id FROM brands WHERE id = $1 AND user_id = $2",
+    //   [brandId, req.user.id],
+    // );
+
     const brandResult = await query(
-      "SELECT id FROM brands WHERE id = $1 AND user_id = $2",
+      `SELECT DISTINCT b.*, 
+          CASE WHEN b.user_id = $2 THEN true ELSE false END as is_owner
+   FROM brands b
+   LEFT JOIN brand_members bm ON b.id = bm.brand_id
+   WHERE b.id = $1 AND (b.user_id = $2 OR bm.user_id = $2)`,
       [brandId, req.user.id],
     );
 
@@ -319,8 +336,17 @@ export const getPerformanceData = async (req, res) => {
     const { dateRange = 30, metrics, linkId } = req.query; // Added linkId to query params
 
     // Verify brand ownership
+    // const brandResult = await query(
+    //   "SELECT * FROM brands WHERE id = $1 AND user_id = $2",
+    //   [brandId, req.user.id],
+    // );
+
     const brandResult = await query(
-      "SELECT * FROM brands WHERE id = $1 AND user_id = $2",
+      `SELECT DISTINCT b.*, 
+          CASE WHEN b.user_id = $2 THEN true ELSE false END as is_owner
+   FROM brands b
+   LEFT JOIN brand_members bm ON b.id = bm.brand_id
+   WHERE b.id = $1 AND (b.user_id = $2 OR bm.user_id = $2)`,
       [brandId, req.user.id],
     );
 
