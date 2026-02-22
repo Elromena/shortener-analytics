@@ -123,7 +123,7 @@ export const WeeklyChart = ({ data, chartMetrics }) => {
               name={platform}
               fill={platformColors[platform] || "#8884d8"}
               stackId="platforms"
-              radius={[4, 4, 0, 0]}
+              radius={[0, 0, 0, 0]}
               barSize={40} // Control bar width
             />
           ))}
