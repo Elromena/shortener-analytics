@@ -1,14 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { useState, useEffect } from "react";
+import { DailyLineChart, WeeklyChart, WeeklySummary } from "./WeeklyChartView";
 
 const CHART_COLORS = {
   total: "#6366f1",
@@ -38,6 +29,7 @@ export default function DashboardView({
   appUrl,
 }) {
   const [dateRange, setDateRange] = useState(30);
+  // const [responseData, setResponseData] = useState([]);
   const [chartMetrics, setChartMetrics] = useState({
     total: true,
     byPlatform: false,
@@ -58,6 +50,7 @@ export default function DashboardView({
   const [topPerformers, setTopPerformers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [linkId, setLinkId] = useState("");
+  const [viewType, setViewType] = useState("daily"); // 'daily' or 'weekly'
 
   useEffect(() => {
     loadStats();
@@ -94,6 +87,7 @@ export default function DashboardView({
       chartMetrics,
       linkId,
     );
+
     setChartData(data);
   };
 
@@ -250,17 +244,39 @@ export default function DashboardView({
         <div className="chart-header">
           <h2>Performance</h2>
           <div className="chart-controls">
-            <div className="date-range-buttons">
-              {[7, 30, 60, 90].map((days) => (
-                <button
-                  key={days}
-                  className={`btn btn-sm ${dateRange === days ? "active" : "btn-ghost"}`}
-                  onClick={() => setDateRange(days)}
-                >
-                  {days}d
-                </button>
-              ))}
+            <div className="view-type-buttons">
+              <button
+                className={`btn btn-sm ${viewType === "daily" ? "active" : "btn-ghost"}`}
+                onClick={() => setViewType("daily")}
+              >
+                Daily
+              </button>
+              <button
+                className={`btn btn-sm ${viewType === "weekly" ? "active" : "btn-ghost"}`}
+                onClick={() => setViewType("weekly")}
+              >
+                Weekly
+              </button>
             </div>
+
+            {viewType === "daily" ? (
+              <div className="date-range-buttons">
+                {[7, 30, 60, 90].map((days) => (
+                  <button
+                    key={days}
+                    className={`btn btn-sm ${dateRange === days ? "active" : "btn-ghost"}`}
+                    onClick={() => setDateRange(days)}
+                  >
+                    {days}d
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="weekly-note">
+                <span className="text-sm text-secondary">Last 8 weeks</span>
+              </div>
+            )}
+
             <div className="chart-metrics">
               <label className="checkbox-label">
                 <input
@@ -289,42 +305,17 @@ export default function DashboardView({
             </div>
           </div>
         </div>
+
+        {viewType === "weekly" && <WeeklySummary data={chartData} />}
+
         <div className="chart-container">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart
-              data={chartData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis
-                dataKey="date"
-                stroke="var(--text-secondary)"
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis stroke="var(--text-secondary)" tick={{ fontSize: 12 }} />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--bg-tertiary)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
-                }}
-                labelStyle={{ color: "var(--text-primary)" }}
-              />
-              <Legend />
-              {chartLines.map(({ key, label, color }) => (
-                <Line
-                  key={key}
-                  type="monotone"
-                  dataKey={key}
-                  name={label}
-                  stroke={color}
-                  strokeWidth={2}
-                  dot={false}
-                  connectNulls
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+          {viewType === "daily" && (
+            <DailyLineChart chartLines={chartLines} data={chartData} />
+          )}
+
+          {viewType === "weekly" && (
+            <WeeklyChart chartMetrics={chartMetrics} data={chartData} />
+          )}
         </div>
       </section>
 
