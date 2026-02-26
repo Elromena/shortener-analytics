@@ -446,7 +446,7 @@ export default function DashboardView({
                 <th>Title</th>
                 <th>Short URL</th>
                 <th>Platform</th>
-                <th>Category</th>
+                <th>Content Type</th>
                 <th>Clicks</th>
                 <th>Status</th>
                 <th>Actions</th>
