@@ -476,7 +476,7 @@ export default function DashboardView({
                     </code>
                   </td>
                   <td>{link.platform}</td>
-                  <td>{link.category}</td>
+                  <td>{link.content_type}</td>
                   <td>{link.clickCount}</td>
                   <td>
                     <span className={`status-badge status-${link.status}`}>
