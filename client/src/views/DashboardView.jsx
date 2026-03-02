@@ -31,8 +31,8 @@ export default function DashboardView({
   const [dateRange, setDateRange] = useState(30);
   // const [responseData, setResponseData] = useState([]);
   const [chartMetrics, setChartMetrics] = useState({
-    total: true,
-    byPlatform: false,
+    total: false,
+    byPlatform: true,
     byCategory: false,
   });
   const [searchQuery, setSearchQuery] = useState("");
@@ -278,14 +278,14 @@ export default function DashboardView({
             )}
 
             <div className="chart-metrics">
-              <label className="checkbox-label">
+              {/* <label className="checkbox-label">
                 <input
                   type="checkbox"
                   checked={chartMetrics.total}
                   onChange={() => toggleChartMetric("total")}
                 />
                 Total Clicks
-              </label>
+              </label> */}
               <label className="checkbox-label">
                 <input
                   type="checkbox"
@@ -477,7 +477,7 @@ export default function DashboardView({
                   </td>
                   <td>{link.platform}</td>
                   <td>{link.content_type}</td>
-                  <td>{link.clickCount}</td>
+                  <td>{link.click_count}</td>
                   <td>
                     <span className={`status-badge status-${link.status}`}>
                       {link.status}
